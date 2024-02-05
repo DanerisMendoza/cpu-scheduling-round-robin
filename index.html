@@ -13,45 +13,58 @@
 <body>
     <h2>Round Robin Scheduling</h2>
     <form method="post" id="processForm">
-        <label for="time_quantum">TimeQuantum: </label>
+        <label for="time_quantum">Time Quantum: </label>
         <input type="text" name="time_quantum" value="2" required>
-        <br></br>
+        <br><br>
         <table id="processTable">
             <thead>
                 <tr>
                     <th>Process ID</th>
                     <th>Arrival Time</th>
                     <th>Burst Time</th>
+                    <th>Completion Time</th>
+                    <th>Turnaround Time</th>
+                    <th>Waiting Time</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td><input type="text" name="process_id[]" value="1" required></td>
-                    <td><input type="text" name="arrival_time[]" value="10" required></td>
+                    <td><input type="text" name="arrival_time[]" value="0" required></td>
                     <td><input type="text" name="burst_time[]" value="5" required></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td><input type="text" name="process_id[]" value="2" required></td>
-                    <td><input type="text" name="arrival_time[]" value="20" required></td>
-                    <td><input type="text" name="burst_time[]" value="8" required></td>
+                    <td><input type="text" name="arrival_time[]" value="1" required></td>
+                    <td><input type="text" name="burst_time[]" value="3" required></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td><input type="text" name="process_id[]" value="3" required></td>
-                    <td><input type="text" name="arrival_time[]" value="30" required></td>
-                    <td><input type="text" name="burst_time[]" value="12" required></td>
+                    <td><input type="text" name="arrival_time[]" value="2" required></td>
+                    <td><input type="text" name="burst_time[]" value="3" required></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td><input type="text" name="process_id[]" value="4" required></td>
-                    <td><input type="text" name="arrival_time[]" value="40" required></td>
-                    <td><input type="text" name="burst_time[]" value="7" required></td>
+                    <td><input type="text" name="arrival_time[]" value="4" required></td>
+                    <td><input type="text" name="burst_time[]" value="1" required></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
             </tbody>
         </table>
         <br>
-        <input type="submit" value="Add Processes">
+        <input type="submit" value="Calculate">
     </form>
-    
-
 </body>
 
 </html>
@@ -62,17 +75,22 @@
         $("#processForm").submit(function (event) {
             event.preventDefault(); // Prevent default form submission
             var formData = $(this).serialize(); // used to create a URL-encoded string representation of form data.
-            // console.log($(this))
-            // console.log(formData)
+
             $.ajax({
                 url: "api.php",
                 type: "POST",
                 data: formData,
-                dataType: "json", 
+                dataType: "json",
                 success: function (response) {
-                    // if(response.success){
-                        console.log(response.data);
-                    // }
+                    if (response.success) {
+                        // Append completion times, turnaround times, and waiting times to the table
+                        $.each(response.data.process_ids, function (index, process_id) {
+                            var row = $('#processTable tbody tr').eq(index);
+                            row.find('td:eq(3)').text(response.data.completion_times[index]);
+                            row.find('td:eq(4)').text(response.data.turnaround_times[index]);
+                            row.find('td:eq(5)').text(response.data.waiting_times[index]);
+                        });
+                    }
                 },
                 error: function (xhr, status, error) {
                     console.error(xhr.responseText);
@@ -81,7 +99,6 @@
         });
     });
 </script>
-
 <style>
     table {
         border-collapse: collapse;
