@@ -69,6 +69,7 @@
     <!-- Gantt Chart Section -->
     <div id="ganttChartContainer">
         <h3>Gantt Chart</h3>
+        <div id="ganttChartCompletionTime"></div>
         <div id="ganttChart"></div>
     </div>
 </body>
@@ -99,8 +100,24 @@
                             row.find('td:eq(5)').text(response.data.waiting_times[index]);
                         });
 
-                        // Generate Gantt Chart
-                        generateGanttChart(response.data.gantt_chart);
+                        var ganttChart = $("#ganttChart");
+                        var ganttChartCompletionTime = $("#ganttChartCompletionTime");
+                        ganttChart.empty(); // Clear previous data
+                        ganttChartCompletionTime.empty(); // Clear previous data
+
+                        // Calculate total time
+                        var totalTime = 0;
+                        response.data.gantt_chart.forEach(function (segment) {
+                            totalTime = Math.max(totalTime, segment.end);
+                        });
+
+                        // Create Gantt Chart
+                        response.data.gantt_chart.forEach(function (segment) {
+                            var segmentDivLabel = $("<div></div>").addClass("gantt-segmentCompletionTime").css("width", "50px").text(segment.start);
+                            ganttChartCompletionTime.append(segmentDivLabel);
+                            var segmentDiv = $("<div></div>").addClass("gantt-segment").css("width", "50px").text(segment.process_id);
+                            ganttChart.append(segmentDiv);
+                        });
                     }
                 },
                 error: function (xhr, status, error) {
@@ -108,25 +125,6 @@
                 }
             });
         });
-
-        // Function to generate Gantt Chart
-        function generateGanttChart(ganttData) {
-            var ganttChart = $("#ganttChart");
-            ganttChart.empty(); // Clear previous data
-
-            // Calculate total time
-            var totalTime = 0;
-            ganttData.forEach(function (segment) {
-                totalTime = Math.max(totalTime, segment.end);
-            });
-
-            // Create Gantt Chart
-            ganttData.forEach(function (segment) {
-                var width = ((segment.end - segment.start) / totalTime) * 100;
-                var segmentDiv = $("<div></div>").addClass("gantt-segment").css("width", width + "%").text(segment.process_id);
-                ganttChart.append(segmentDiv);
-            });
-        }
     });
 </script>
 
@@ -151,7 +149,7 @@
         margin-top: 20px;
     }
 
-    #ganttChart {
+    #ganttChart,#ganttChartCompletionTime{
         display: flex;
         border: 1px solid #ccc;
         height: 50px;
@@ -161,6 +159,14 @@
         border-right: 1px solid #999;
         box-sizing: border-box;
         text-align: center;
+        line-height: 50px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    .gantt-segmentCompletionTime {
+        /* border-right: 1px solid #999; */
+        box-sizing: border-box;
+        text-align: start;
         line-height: 50px;
         overflow: hidden;
         white-space: nowrap;

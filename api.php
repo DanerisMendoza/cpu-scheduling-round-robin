@@ -25,6 +25,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ganttChart = array();
     $currentProcess = null;
 
+    // Include processes that arrive at time zero in the Gantt chart
+    for ($i = 0; $i < $n; $i++) {
+        if ($arrivalTime_arr[$i] == 0) {
+            $ganttChart[] = array(
+                'process_id' => $process_id_arr[$i],
+                'start' => 0,
+                'end' => 0
+            );
+        }
+    }
+
     while (true) {
         $done = true;
 
