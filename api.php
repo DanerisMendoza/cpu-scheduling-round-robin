@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $ganttChart[] = array(
                             'process_id' => $process_id_arr[$currentProcess],
                             'start' => $ganttStart,
-                            'end' => $currentTime
+                            'completionTime' => $currentTime
                         );
                     }
                     $currentProcess = $i;
@@ -75,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $ganttChart[] = array(
             'process_id' => $process_id_arr[$currentProcess],
             'start' => $ganttStart,
-            'end' => $currentTime
+            'completionTime' => $currentTime
         );
     }
 

@@ -69,6 +69,7 @@
     <!-- Gantt Chart Section -->
     <div id="ganttChartContainer">
         <h3>Gantt Chart</h3>
+        <div id="ganttChartCompletionTime"></div>
         <div id="ganttChart"></div>
     </div>
 </body>
@@ -76,58 +77,60 @@
 </html>
 
 <script>
-    $(document).ready(function () {
-        // Call API when form is submitted
-        $("#processForm").submit(function (event) {
-            event.preventDefault(); // Prevent default form submission
-            var formData = $(this).serialize(); // used to create a URL-encoded string representation of form data.
+   $(document).ready(function () {
+    // Call API when form is submitted
+    $("#processForm").submit(function (event) {
+        event.preventDefault(); // Prevent default form submission
+        var formData = $(this).serialize(); // used to create a URL-encoded string representation of form data.
 
-            $.ajax({
-                url: "api.php",
-                type: "POST",
-                data: formData,
-                dataType: "json",
-                success: function (response) {
-                    if (response.success) {
-                        console.log(response.data);
+        $.ajax({
+            url: "api.php",
+            type: "POST",
+            data: formData,
+            dataType: "json",
+            success: function (response) {
+                if (response.success) {
+                    console.log(response.data);
 
-                        // Append completion times, turnaround times, and waiting times to the table
-                        $.each(response.data.process_ids, function (index, process_id) {
-                            var row = $('#processTable tbody tr').eq(index);
-                            row.find('td:eq(3)').text(response.data.completion_times[index]);
-                            row.find('td:eq(4)').text(response.data.turnaround_times[index]);
-                            row.find('td:eq(5)').text(response.data.waiting_times[index]);
-                        });
+                    // Append completion times, turnaround times, and waiting times to the table
+                    $.each(response.data.process_ids, function (index, process_id) {
+                        var row = $('#processTable tbody tr').eq(index);
+                        row.find('td:eq(3)').text(response.data.completion_times[index]);
+                        row.find('td:eq(4)').text(response.data.turnaround_times[index]);
+                        row.find('td:eq(5)').text(response.data.waiting_times[index]);
+                    });
 
-                        // Generate Gantt Chart
-                        generateGanttChart(response.data.gantt_chart);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error(xhr.responseText);
+                    var ganttChart = $("#ganttChart");
+                    var ganttChartCompletionTime = $("#ganttChartCompletionTime");
+                    ganttChart.empty(); // Clear previous data
+                    ganttChartCompletionTime.empty(); // Clear previous data
+
+                    // Calculate total time
+                    var totalTime = 0;
+                    response.data.gantt_chart.forEach(function (segment) {
+                        totalTime = Math.max(totalTime, segment.completionTime);
+                    });
+
+                    // Create Gantt Chart
+                    response.data.gantt_chart.forEach(function (segment, index) {
+                        var width = ((segment.completionTime - segment.start) / totalTime) * 100;
+                        var segmentDiv = $("<div></div>").addClass("gantt-segment").css("width", width + "%").text(segment.process_id);
+                        ganttChart.append(segmentDiv);
+
+                        // Add completion time label above each segment
+                        var labelDiv = $("<div></div>").addClass("gantt-label").text(segment.completionTime);
+                        labelDiv.css("left", width / 2 + "%"); // Position label at the middle of the segment
+                        ganttChartCompletionTime.append(labelDiv);
+                    });
                 }
-            });
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr.responseText);
+            }
         });
-
-        // Function to generate Gantt Chart
-        function generateGanttChart(ganttData) {
-            var ganttChart = $("#ganttChart");
-            ganttChart.empty(); // Clear previous data
-
-            // Calculate total time
-            var totalTime = 0;
-            ganttData.forEach(function (segment) {
-                totalTime = Math.max(totalTime, segment.end);
-            });
-
-            // Create Gantt Chart
-            ganttData.forEach(function (segment) {
-                var width = ((segment.end - segment.start) / totalTime) * 100;
-                var segmentDiv = $("<div></div>").addClass("gantt-segment").css("width", width + "%").text(segment.process_id);
-                ganttChart.append(segmentDiv);
-            });
-        }
     });
+});
+
 </script>
 
 <style>
@@ -155,6 +158,7 @@
         display: flex;
         border: 1px solid #ccc;
         height: 50px;
+        position: relative; /* Positioning container for absolute positioning of labels */
     }
 
     .gantt-segment {
@@ -164,5 +168,12 @@
         line-height: 50px;
         overflow: hidden;
         white-space: nowrap;
+    }
+
+    .gantt-label {
+        position: absolute;
+        top: -20px; /* Position above the Gantt chart */
+        font-size: 10px;
+        text-align: center;
     }
 </style>
