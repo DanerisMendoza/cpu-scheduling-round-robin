@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Round Robin Scheduling</title>
+    <!-- Include jQuery library -->
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <script src="jQuery 3.7.1.js"></script>
+</head>
+
+<body>
+    <h2>Round Robin Scheduling</h2>
+    <form method="post" id="processForm">
+        <label for="time_quantum">TimeQuantum: </label>
+        <input type="text" name="time_quantum" value="2" required>
+        <br></br>
+        <table id="processTable">
+            <thead>
+                <tr>
+                    <th>Process ID</th>
+                    <th>Arrival Time</th>
+                    <th>Burst Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" name="process_id[]" value="1" required></td>
+                    <td><input type="text" name="arrival_time[]" value="10" required></td>
+                    <td><input type="text" name="burst_time[]" value="5" required></td>
+                </tr>
+                <tr>
+                    <td><input type="text" name="process_id[]" value="2" required></td>
+                    <td><input type="text" name="arrival_time[]" value="20" required></td>
+                    <td><input type="text" name="burst_time[]" value="8" required></td>
+                </tr>
+                <tr>
+                    <td><input type="text" name="process_id[]" value="3" required></td>
+                    <td><input type="text" name="arrival_time[]" value="30" required></td>
+                    <td><input type="text" name="burst_time[]" value="12" required></td>
+                </tr>
+                <tr>
+                    <td><input type="text" name="process_id[]" value="4" required></td>
+                    <td><input type="text" name="arrival_time[]" value="40" required></td>
+                    <td><input type="text" name="burst_time[]" value="7" required></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <input type="submit" value="Add Processes">
+    </form>
+    
+
+</body>
+
+</html>
+
+<script>
+    $(document).ready(function () {
+        // Call API when form is submitted
+        $("#processForm").submit(function (event) {
+            event.preventDefault(); // Prevent default form submission
+            var formData = $(this).serialize(); // used to create a URL-encoded string representation of form data.
+            // console.log($(this))
+            // console.log(formData)
+            $.ajax({
+                url: "api.php",
+                type: "POST",
+                data: formData,
+                dataType: "json", 
+                success: function (response) {
+                    // if(response.success){
+                        console.log(response.data);
+                    // }
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    table {
+        border-collapse: collapse;
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid black;
+    }
+
+    th,
+    td {
+        padding: 10px;
+        text-align: center;
+    }
+</style>
