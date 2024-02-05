@@ -21,6 +21,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $waitingTime_arr[$i] = 0;
     }
 
+    // Gantt chart data
+    $ganttChart = array();
+    $currentProcess = null;
+
     while (true) {
         $done = true;
 
@@ -45,12 +49,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // Calculate turnaround time
                     $turnaroundTime_arr[$i] = $completionTime_arr[$i] - $arrivalTime_arr[$i];
                 }
+
+                // Gantt chart update
+                if ($currentProcess !== $i) {
+                    if ($currentProcess !== null) {
+                        $ganttChart[] = array(
+                            'process_id' => $process_id_arr[$currentProcess],
+                            'start' => $ganttStart,
+                            'end' => $currentTime
+                        );
+                    }
+                    $currentProcess = $i;
+                    $ganttStart = $currentTime;
+                }
             }
         }
 
         if ($done) {
             break;
         }
+    }
+
+    // Add the last segment to the Gantt chart
+    if ($currentProcess !== null) {
+        $ganttChart[] = array(
+            'process_id' => $process_id_arr[$currentProcess],
+            'start' => $ganttStart,
+            'end' => $currentTime
+        );
     }
 
     // Construct a response
@@ -64,7 +90,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'completion_times' => $completionTime_arr,
             'turnaround_times' => $turnaroundTime_arr,
             'waiting_times' => $waitingTime_arr,
-            'time_quantum' => $time_quantum // Include time quantum in response
+            'time_quantum' => $time_quantum, // Include time quantum in response
+            'gantt_chart' => $ganttChart // Include Gantt chart in response
         )
     );
 
