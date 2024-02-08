@@ -12,6 +12,7 @@
 
 <body>
     <h2>Round Robin Scheduling</h2>
+    <h5>Round Robin will execute each proccess for the duration of the time quantum. It will then move on to the next proccess. </h5>
     <form method="post" id="processForm">
         <label for="time_quantum">Time Quantum: </label>
         <input type="text" name="time_quantum" value="2" required>
@@ -67,7 +68,7 @@
     </form>
 
     <!-- Gantt Chart Section -->
-    <div id="ganttChartContainer">
+    <div>
         <h3>Gantt Chart</h3>
         <div id="ganttChartCompletionTime"></div>
         <div id="ganttChart"></div>
@@ -110,10 +111,14 @@
                         response.data.gantt_chart.forEach(function (segment) {
                             totalTime = Math.max(totalTime, segment.end);
                         });
+                        
+                        // add constant zero at start
+                        var segmentDivLabel = $("<div></div>").addClass("gantt-segmentCompletionTime2").css("width", "50px").text(0);
+                        ganttChartCompletionTime.append(segmentDivLabel);
 
                         // Create Gantt Chart
                         response.data.gantt_chart.forEach(function (segment) {
-                            var segmentDivLabel = $("<div></div>").addClass("gantt-segmentCompletionTime").css("width", "50px").text(segment.start);
+                            var segmentDivLabel = $("<div></div>").addClass("gantt-segmentCompletionTime").css("width", "50px").text(segment.end_time);
                             ganttChartCompletionTime.append(segmentDivLabel);
                             var segmentDiv = $("<div></div>").addClass("gantt-segment").css("width", "50px").text(segment.process_id);
                             ganttChart.append(segmentDiv);
@@ -145,13 +150,14 @@
         text-align: center;
     }
 
-    #ganttChartContainer {
-        margin-top: 20px;
-    }
-
-    #ganttChart,#ganttChartCompletionTime{
+  
+    #ganttChart{
         display: flex;
         border: 1px solid #ccc;
+        height: 50px;
+    }
+    #ganttChartCompletionTime{
+        display: flex;
         height: 50px;
     }
 
@@ -164,6 +170,14 @@
         white-space: nowrap;
     }
     .gantt-segmentCompletionTime {
+        /* border-right: 1px solid #999; */
+        text-align: start;
+        box-sizing: border-box;
+        line-height: 50px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    .gantt-segmentCompletionTime2 {
         /* border-right: 1px solid #999; */
         box-sizing: border-box;
         text-align: start;
