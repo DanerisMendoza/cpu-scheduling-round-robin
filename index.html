@@ -113,7 +113,7 @@
                         });
                         
                         // add constant zero at start
-                        var segmentDivLabel = $("<div></div>").addClass("gantt-segmentCompletionTime2").css("width", "50px").text(0);
+                        var segmentDivLabel = $("<div></div>").addClass("gantt-segmentCompletionTime").css("width", "50px").text(0);
                         ganttChartCompletionTime.append(segmentDivLabel);
 
                         // Create Gantt Chart
@@ -173,14 +173,6 @@
         /* border-right: 1px solid #999; */
         text-align: start;
         box-sizing: border-box;
-        line-height: 50px;
-        overflow: hidden;
-        white-space: nowrap;
-    }
-    .gantt-segmentCompletionTime2 {
-        /* border-right: 1px solid #999; */
-        box-sizing: border-box;
-        text-align: start;
         line-height: 50px;
         overflow: hidden;
         white-space: nowrap;
