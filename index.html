@@ -12,7 +12,8 @@
 
 <body>
     <h2>Round Robin Scheduling</h2>
-    <h5>Round Robin will execute each proccess for the duration of the time quantum. It will then move on to the next proccess. </h5>
+    <h5>Round Robin will execute each proccess for the duration of the time quantum. It will then move on to the next
+        proccess. </h5>
     <form method="post" id="processForm">
         <label for="time_quantum">Time Quantum: </label>
         <input type="text" name="time_quantum" value="2" required>
@@ -64,6 +65,7 @@
             </tbody>
         </table>
         <br>
+        <button type="button" id="generate">Generate New Process</button>
         <input type="submit" value="Calculate">
     </form>
 
@@ -82,11 +84,34 @@
 
 <script>
     $(document).ready(function () {
+        // Event listener for the button click
+        $('#generate').click(function () {
+            var rowCount = $('#processTable tbody tr').length + 1;
+            var lastRow = $('#processTable tbody tr:last');
+            var newRow = lastRow.clone();
+            newRow.find('input').val('');
+            newRow.find('input:first').val('P' + rowCount);
+            lastRow.after(newRow);
+        });
+
+        function validateForm() {
+            var valid = true;
+            $('#processTable input').each(function () {
+                if ($(this).val() === '') {
+                    valid = false;
+                    return false; // Exit the loop early if any field is empty
+                }
+            });
+            return valid;
+        }
+
         // Call API when form is submitted
         $("#processForm").submit(function (event) {
             event.preventDefault(); // Prevent default form submission
+            if(!validateForm()){
+                return;
+            }
             var formData = $(this).serialize(); // used to create a URL-encoded string representation of form data.
-
             $.ajax({
                 url: "api.php",
                 type: "POST",
@@ -114,7 +139,7 @@
                         response.data.gantt_chart.forEach(function (segment) {
                             totalTime = Math.max(totalTime, segment.end);
                         });
-                        
+
                         // add constant zero at start
                         var segmentDivLabel = $("<div></div>").addClass("gantt-segmentCompletionTime").css("width", "50px").text(0);
                         ganttChartCompletionTime.append(segmentDivLabel);
@@ -158,13 +183,14 @@
         text-align: center;
     }
 
-  
-    #ganttChart{
+
+    #ganttChart {
         display: flex;
         border: 1px solid #ccc;
         height: 50px;
     }
-    #ganttChartCompletionTime{
+
+    #ganttChartCompletionTime {
         display: flex;
         height: 50px;
     }
@@ -177,6 +203,7 @@
         overflow: hidden;
         white-space: nowrap;
     }
+
     .gantt-segmentCompletionTime {
         /* border-right: 1px solid #999; */
         text-align: start;
