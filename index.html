@@ -72,6 +72,9 @@
         <h3>Gantt Chart</h3>
         <div id="ganttChartCompletionTime"></div>
         <div id="ganttChart"></div>
+        <h3>Completion Time Average: <span id="CompletionTimeAverage"></span></h3>
+        <h3>Turnaround Time Average: <span id="TurnAroundTimeAverage"></span></h3>
+        <h3>Waiting Time Average: <span id="WaitingTimeAverage"></span></h3>
     </div>
 </body>
 
@@ -123,6 +126,11 @@
                             var segmentDiv = $("<div></div>").addClass("gantt-segment").css("width", "50px").text(segment.process_id);
                             ganttChart.append(segmentDiv);
                         });
+
+                        // average
+                        $("#CompletionTimeAverage").text(response.data.completion_time_average.toFixed(2));
+                        $("#TurnAroundTimeAverage").text(response.data.turnaround_time_average.toFixed(2));
+                        $("#WaitingTimeAverage").text(response.data.waiting_time_average.toFixed(2));
                     }
                 },
                 error: function (xhr, status, error) {

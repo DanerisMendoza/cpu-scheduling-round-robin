@@ -46,6 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+   
+
     // Construct a response
     $response = array(
         'success' => true,
@@ -57,12 +59,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'completion_times' => $completionTime_arr,
             'turnaround_times' => $turnaroundTime_arr,
             'waiting_times' => $waitingTime_arr,
-            'time_quantum' => $time_quantum, // Include time quantum in response
-            'gantt_chart' => $ganttChart // Include Gantt chart in response
+            'time_quantum' => $time_quantum, 
+            'gantt_chart' => $ganttChart,
+            'completion_time_average' => getAverage($completionTime_arr), 
+            'turnaround_time_average' => getAverage($turnaroundTime_arr), 
+            'waiting_time_average' => getAverage($waitingTime_arr), 
         )
     );
 
     // Encode the response as JSON
     echo json_encode($response);
 }
+
+function getAverage($arr){
+    $average =  (array_sum($arr))/(count($arr));
+    return $average;
+}
+
 ?>
