@@ -19,6 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($remaining_burstTime_arr[$i] > 0) {
                 // Process the current process then mark as complete and set the the 3 array
                 // Process completes within time quantum
+                // no burst time left
                 if ($remaining_burstTime_arr[$i] <= $time_quantum) {
                     $current_time += $remaining_burstTime_arr[$i];
                     $remaining_burstTime_arr[$i] = 0;
@@ -29,6 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $completed_processes++;
                 } 
                 // Process still needs more time
+                // still have burst time
                 else {
                     $current_time += $time_quantum;
                     $remaining_burstTime_arr[$i] -= $time_quantum;
@@ -44,9 +46,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-
-
-    // Construct a response
     $response = array(
         'success' => true,
         'message' => 'Form data processed successfully.',
@@ -64,8 +63,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'waiting_time_average' => getAverage($waitingTime_arr),
         )
     );
-
-    // Encode the response as JSON
     echo json_encode($response);
 }
 
