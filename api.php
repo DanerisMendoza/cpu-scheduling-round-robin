@@ -37,6 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
 
                 // Record the Gantt chart
+                // regardless if burst time is greater than time quantum or within time quantum
                 $ganttChart[] = array(
                     'process_id' => $process_id_arr[$i],
                     'start_time' => $current_time - $time_quantum,
