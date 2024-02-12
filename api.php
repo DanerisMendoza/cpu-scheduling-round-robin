@@ -7,6 +7,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $burstTime_arr = $_POST['burst_time'];
     $time_quantum = $_POST['time_quantum']; // Extracting time quantum from POST data
 
+    // Initialize arrays to store completion time, turnaround time, and waiting time
+    $completionTime_arr = array();
+    $turnaroundTime_arr = array();
+    $waitingTime_arr = array();
+
     // Calculate completion time, turnaround time, and waiting time using Round Robin Scheduling
     $total_processes = count($process_id_arr);
     $remaining_burstTime_arr = $burstTime_arr;
@@ -15,8 +20,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ganttChart = array();
 
     while ($completed_processes < $total_processes) {
+        $process_executed = false; // Flag to track if a process was executed in the current time quantum
+
         for ($i = 0; $i < $total_processes; $i++) {
-            if ($remaining_burstTime_arr[$i] > 0) {
+            if ($remaining_burstTime_arr[$i] > 0 && $arrivalTime_arr[$i] <= $current_time) {
                 // Process the current process then mark as complete and set the the 3 array
                 // Process completes within time quantum
                 // no burst time left
@@ -24,14 +31,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $current_time += $remaining_burstTime_arr[$i];
                     $remaining_burstTime_arr[$i] = 0;
 
-                    $completionTime_arr[$i] = $current_time;    
+                    $completionTime_arr[$i] = $current_time;
                     $turnaroundTime_arr[$i] = $current_time - $arrivalTime_arr[$i];
                     $waitingTime_arr[$i] = $turnaroundTime_arr[$i] - $burstTime_arr[$i];
                     $completed_processes++;
-                } 
-                // Process still needs more time
-                // still have burst time
-                else {
+                } else {
+                    // Process still needs more time
+                    // still have burst time
                     $current_time += $time_quantum;
                     $remaining_burstTime_arr[$i] -= $time_quantum;
                 }
@@ -40,10 +46,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // regardless if burst time is greater than time quantum or within time quantum
                 $ganttChart[] = array(
                     'process_id' => $process_id_arr[$i],
-                    'start_time' => $current_time - $time_quantum,
+                    'start_time' => $current_time - min($time_quantum, $remaining_burstTime_arr[$i]),
                     'end_time' => $current_time
                 );
+
+                $process_executed = true; // Set flag to true since a process was executed
             }
+        }
+
+        // If no process was executed, increment current_time to avoid infinite loop
+        if (!$process_executed) {
+            $current_time++;
         }
     }
 
