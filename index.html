@@ -108,7 +108,7 @@
         // Call API when form is submitted
         $("#processForm").submit(function (event) {
             event.preventDefault(); // Prevent default form submission
-            if(!validateForm()){
+            if (!validateForm()) {
                 return;
             }
             var formData = $(this).serialize(); // used to create a URL-encoded string representation of form data.
@@ -140,9 +140,18 @@
                             totalTime = Math.max(totalTime, segment.end);
                         });
 
-                        // add constant zero at start
+                        // first segment start
+                        const firstSegmentStart = response.data.gantt_chart[0].start_time
                         var segmentDivLabel = $("<div></div>").addClass("gantt-segmentCompletionTime").css("width", "50px").text(0);
                         ganttChartCompletionTime.append(segmentDivLabel);
+
+                        if (firstSegmentStart != 0) {
+                            var segmentDiv = $("<div></div>").addClass("gantt-segment").css("width", "50px").text("");
+                            ganttChart.append(segmentDiv);
+
+                            var segmentDivLabel = $("<div></div>").addClass("gantt-segmentCompletionTime").css("width", "50px").text(firstSegmentStart);
+                            ganttChartCompletionTime.append(segmentDivLabel);
+                        }
 
                         // Create Gantt Chart
                         response.data.gantt_chart.forEach(function (segment) {
