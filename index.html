@@ -154,12 +154,30 @@
                         }
 
                         // Create Gantt Chart
-                        response.data.gantt_chart.forEach(function (segment) {
+                        for (var i = 0; i < response.data.gantt_chart.length; i++) {
+                            var segment = response.data.gantt_chart[i];
+
                             var segmentDivLabel = $("<div></div>").addClass("gantt-segmentCompletionTime").css("width", "50px").text(segment.end_time);
                             ganttChartCompletionTime.append(segmentDivLabel);
+
                             var segmentDiv = $("<div></div>").addClass("gantt-segment").css("width", "50px").text(segment.process_id);
                             ganttChart.append(segmentDiv);
-                        });
+
+
+                            const a = response.data.gantt_chart
+                            if (i != a.length - 1) {
+                                const b1 = a[i].end_time
+                                const b2 = a[i + 1].start_time
+                                if (b1 != b2) {
+                                    var segmentDivLabel = $("<div></div>").addClass("gantt-segmentCompletionTime").css("width", "50px").text(b2);
+                                    ganttChartCompletionTime.append(segmentDivLabel);
+
+                                    var segmentDiv = $("<div></div>").addClass("gantt-segment").css("width", "50px").text("");
+                                    ganttChart.append(segmentDiv);
+                                }
+                            }
+                        }
+
 
                         // average
                         $("#CompletionTimeAverage").text(response.data.completion_time_average.toFixed(2));
