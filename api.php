@@ -18,12 +18,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $current_time = 0;
     $completed_processes = 0;
     $ganttChart = array();
-
+    $start_times = array_fill(0, $total_processes, 0);
     while ($completed_processes < $total_processes) {
         $process_executed = false; // Flag to track if a process was executed in the current time quantum
 
         for ($i = 0; $i < $total_processes; $i++) {
             if ($remaining_burstTime_arr[$i] > 0 && $arrivalTime_arr[$i] <= $current_time) {
+                $start_times[$i] = max($current_time, $arrivalTime_arr[$i]); 
                 // Process the current process then mark as complete and set the the 3 array
                 // Process completes within time quantum
                 // no burst time left
@@ -46,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // regardless if burst time is greater than time quantum or within time quantum
                 $ganttChart[] = array(
                     'process_id' => $process_id_arr[$i],
-                    'start_time' => $current_time - min($time_quantum, $remaining_burstTime_arr[$i]),
+                    'start_time' => $start_times[$i],
                     'end_time' => $current_time
                 );
 
